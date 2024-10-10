@@ -2,9 +2,87 @@ import express from "express";
 import os from "os";
 import { read, write } from "./src/utils/files.js"; // Mantén la utilidad de leer/escribir archivos
 import Joi from "joi"; // Importa Joi para validar los datos de la cita
+import PDFDocument from "pdfkit";
+import path from "path";
+import fs from 'fs';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 app.use(express.json());
+
+let appointments = []; // Aquí se almacenan las citas
+
+const appointmentsFilePath = path.join(__dirname, 'appointment.json');
+const pdfDir = path.join(__dirname, 'pdfs');
+
+// Asegúrate de que la carpeta pdfs existe
+if (!fs.existsSync(pdfDir)) {
+    fs.mkdirSync(pdfDir); // Crea la carpeta si no existe
+}
+
+// Función para leer las citas del archivo JSON
+function readAppointments() {
+    try {
+        const data = fs.readFileSync(appointmentsFilePath);
+        return JSON.parse(data); // Devuelve el array de citas
+    } catch (error) {
+        console.error('Error al leer el archivo de citas:', error);
+        return []; // Devuelve un array vacío en caso de error
+    }
+}
+
+// Función para generar el PDF
+function generatePDF() {
+    const appointments = readAppointments(); // Lee las citas
+    const doc = new PDFDocument();
+    const filePath = path.join(pdfDir, 'appointments.pdf'); // Ruta donde se guardará el PDF
+
+    // Configura la salida del PDF
+    doc.pipe(fs.createWriteStream(filePath));
+
+    // Título del PDF
+    doc.fontSize(25).text('Citas', { align: 'center' });
+    doc.moveDown();
+
+    // Encabezados de la tabla
+    doc.fontSize(12);
+    doc.text('ID    Nombre Paciente          Documento      Especialidad   Fecha       Hora       EPS          Estado', {
+        align: 'left',
+        continued: true
+    });
+
+    // Dibuja una línea debajo de los encabezados
+    doc.moveDown();
+    doc.moveTo(50, doc.y)
+        .lineTo(550, doc.y)
+        .stroke();
+
+    // Añade las citas a la tabla
+    appointments.forEach(app => {
+        const { id, nombre_paciente, documento, especialidad, fecha, hora, EPS, estado } = app;
+        doc.text(`${id}    ${nombre_paciente}        ${documento}       ${especialidad}   ${fecha}   ${hora}   ${EPS}   ${estado}`);
+    });
+
+    // Finaliza el PDF
+    doc.end();
+}
+
+// Llama a generatePDF cuando crees o modifiques una cita
+app.post('/appointments', (req, res) => {
+    // Lógica para crear la cita...
+    generatePDF(); // Llama a la función para generar el PDF
+    res.json({ message: 'Cita creada y PDF actualizado.' });
+});
+
+// Lógica similar para actualizar citas...
+app.put('/appointments/:id', (req, res) => {
+    // Lógica para modificar la cita...
+    generatePDF(); // Llama a la función para generar el PDF
+    res.json({ message: 'Cita modificada y PDF actualizado.' });
+});
 
 // Middleware de log
 app.use((req, res, next) => {
@@ -22,7 +100,9 @@ const appointmentSchema = Joi.object({
         .required(), // Solo 10 dígitos
     especialidad: Joi.string().required(),
     fecha: Joi.date().greater("now").iso().required(), // Fecha superior a hoy
-
+    hora: Joi.string()
+    .pattern(/^([01][0-9]|2[0-3]):([0-5][0-9])$/)
+    .required(), // Validar formato 24 horas
     EPS: Joi.string().required(),
     estado: Joi.string().valid("Pendiente", "Cancelada", "Completada").required(),
     confirmacion_cita: Joi.boolean().required(), // Agregada validación para confirmacion_cita
@@ -66,8 +146,11 @@ app.post(
         };
         appointments.push(appointment);
         write(appointments); // Escribe la nueva cita
+         // Genera el PDF actualizado después de crear/modificar una cita
+        generatePDF();
         res.status(201).json(appointments);
     }
+
 );
 
 // Ruta para obtener una cita específica por ID
@@ -102,6 +185,8 @@ app.put("/appointments/:id", validateAppointmentUpdate, (req, res) => {
         appointments[index] = updatedAppointment;
         write(appointments); // Guarda los cambios
         res.json(updatedAppointment);
+         // Genera el PDF actualizado después de crear/modificar una cita
+        generatePDF();
     } else {
         res.status(404).end();
     }
@@ -121,6 +206,8 @@ app.delete("/appointments/:id", (req, res) => {
         );
         write(appointments);
         res.json(appointments);
+         // Genera el PDF actualizado después de crear/modificar una cita
+        generatePDF();
     } else {
         res.status(404).end();
     }
