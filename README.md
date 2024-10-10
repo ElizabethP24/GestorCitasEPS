@@ -166,3 +166,36 @@ json
     "estado": "Cancelada"
   }
 }
+
+7. Reagendar una cita
+Ruta: PUT /appointments/:id/reschedule
+Descripción: Permite cambiar la fecha y hora de una cita existente.
+Parámetro de ruta: id - el ID de la cita a reagendar.
+Body: Se envía en formato JSON con la nueva fecha y hora.
+Ejemplo de solicitud:
+bash
+Copiar código
+PUT http://localhost:3000/appointments/9/reschedule
+Body:
+json
+Copiar código
+{
+    "fecha": "2024-10-23",
+    "hora": "11:23"
+}
+Ejemplo de respuesta:
+json
+Copiar código
+{
+  "message": "Cita reagendada con éxito",
+  "appointment": {
+    "id": "9",
+    "nombre_paciente": "Esteban Quintero",
+    "documento": "1053000929",
+    "especialidad": "Odontología",
+    "fecha": "2024-10-23",
+    "hora": "11:23",
+    "EPS": "Salud Total",
+    "estado": "Pendiente"
+  }
+}
