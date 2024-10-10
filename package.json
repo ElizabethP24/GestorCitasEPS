@@ -1,0 +1,32 @@
+{
+  "name": "gestorcitaseps",
+  "version": "1.0.0",
+  "description": "Gestor de citas con especialistas para EPS",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "npx nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ElizabethP24/GestorCitasEPS.git"
+  },
+  "keywords": [
+    "API",
+    "express",
+    "nodemon",
+    "node"
+  ],
+  "author": "Elizap",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ElizabethP24/GestorCitasEPS/issues"
+  },
+  "homepage": "https://github.com/ElizabethP24/GestorCitasEPS#readme",
+  "dependencies": {
+    "express": "^4.21.0",
+    "nodemon": "^3.1.7"
+  }
+}
