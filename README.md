@@ -1,6 +1,6 @@
-### GestorCitasEPS
+## GestorCitasEPS
 
-Descripción del Proyecto
+### Descripción del Proyecto
 GestorCitasEPS es una aplicación diseñada para gestionar citas médicas de pacientes en una EPS. El sistema permite crear, actualizar, eliminar y consultar citas, así como filtrarlas según su estado (Pendiente, Cancelada, Completada). Utiliza Node.js y Express para el backend, almacenando las citas en un archivo JSON.
 
 
@@ -10,7 +10,7 @@ Copiar código
 npm run dev
 El servidor correrá en http://localhost:3000.
 
-Rutas de la API
+### Rutas de la API
 
 1. Obtener todas las citas
 Ruta: GET /appointments
@@ -278,3 +278,6 @@ Las citas se validan utilizando un esquema definido en Joi, lo que garantiza que
 Además, este proyecto genera un PDF con las citas almacenadas. La generación del PDF se realiza utilizando la biblioteca [PDFKit](https://pdfkit.org/), que permite crear documentos PDF fácilmente. Las citas se leen desde un archivo `appointments.json`, y el PDF se genera dinámicamente en base a los datos contenidos en este archivo.
 
 El PDF resultante se guarda en la carpeta `pdfs`, y se nombra como `appointments.pdf`. Esto facilita la gestión de las citas, permitiendo su visualización y descarga en formato PDF.
+
+### Colección Postman
+Se adjunta el archivo Appointments.postman_collection.json

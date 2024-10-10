@@ -267,6 +267,7 @@ app.put("/appointments/:id/status", (req, res) => {
         appointments[index] = appointment;
         write(appointments); // Guardar los cambios
         res.json(appointment); // Retornar la cita actualizada
+        generatePDF();
     } else {
         res.status(404).json({ message: "Cita no encontrada" });
     }
@@ -368,6 +369,7 @@ app.put(
 
             write(appointments); // Escribir los cambios en el archivo
             res.json(appointment); // Devolver la cita actualizada
+            generatePDF();
         } else {
             res.status(404).json({ message: "Cita no encontrada" });
         }
@@ -396,6 +398,7 @@ app.put("/appointments/:id/cancel", (req, res) => {
             appointments[index] = appointment;
             write(appointments);
             res.json(appointment);
+            generatePDF();
         }
     } else {
         res.status(404).json({ message: "Cita no encontrada" });
