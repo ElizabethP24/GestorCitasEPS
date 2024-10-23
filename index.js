@@ -70,20 +70,6 @@ function generatePDF() {
     doc.end();
 }
 
-// Llama a generatePDF cuando crees o modifiques una cita
-app.post('/appointments', (req, res) => {
-    // Lógica para crear la cita...
-    generatePDF(); // Llama a la función para generar el PDF
-    res.json({ message: 'Cita creada y PDF actualizado.' });
-});
-
-// Lógica similar para actualizar citas...
-app.put('/appointments/:id', (req, res) => {
-    // Lógica para modificar la cita...
-    generatePDF(); // Llama a la función para generar el PDF
-    res.json({ message: 'Cita modificada y PDF actualizado.' });
-});
-
 // Middleware de log
 app.use((req, res, next) => {
     console.log("Middleware");
