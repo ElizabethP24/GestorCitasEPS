@@ -89,12 +89,6 @@ const appointmentSchema = Joi.object({
 
 // Middleware para validar la actualización de citas
 const validateAppointmentUpdate = (req, res, next) => {
-    // Verificar si la ruta es /updateall
-    if (req.path === '/updatefield') {
-        return next(); // No se valida si la ruta es /updateall
-    }
-    
-// Validar el resto de las rutas usando el esquema de Joi
     const { error } = appointmentSchema.validate(req.body);
     if (error) {
         return res.status(400).json({ message: error.details[0].message });
@@ -414,27 +408,25 @@ appointmentFileRouter.put("/:id/cancel",middleware_IP, (req, res) => {
     }
 });
 
-/// Ruta para actualizar un campo específico en todas las citas
-appointmentFileRouter.put('/updatefield', async (req, res) => {
-    const { fieldName, fieldValue } = req.body; // Campo a actualizar y su nuevo valor
+// Método PUT para actualizar un campo de todos los registros
+appointmentFileRouter.put("/allappointments", (req, res, next) => {
+    // Extraer field y value del cuerpo de la solicitud
+    const { field, value } = req.body;
 
-    // Validar que se proporcionaron los campos necesarios
-    if (!fieldName || !fieldValue) {
-        return res.status(400).json({ message: 'Se requiere fieldName y fieldValue' });
-    }
+    // Leer las citas actuales
+    const appointments = read(); 
 
-    try {
-        const updatedAt = dayjs().format('HH:mm DD-MM-YYYY');
+    // Actualizar el campo para todos los registros
+    const updatedAppointments = appointments.map(appointment => {
+        appointment[field] = value; 
+        appointment[field] 
+// Actualizar el campo especificado
+        appointment.updated_at = dayjs().format('HH:mm DD-MM-YYYY'); // Añadir la fecha y hora actual
+        return appointment; // Retornar el registro actualizado
+    });
 
-        // Actualizar todos los registros
-        await Appointment.updateMany({}, {
-            [fieldName]: fieldValue,
-            [fieldName]: fieldValue, updated_at: updatedAt,
-        });
+    // Escribir las citas actualizadas
+    write(updatedAppointments);
 
-        res.status(200).json({ message: 'Todos los registros han sido actualizados' });
-    } 
-    catch (error) {
-        res.status(500).json({ message: 'Error al actualizar los registros', error });
-    }
+    res.status(200).json(updatedAppointments); // Respuesta con los registros actualizados
 });
